@@ -86,7 +86,7 @@ for TEST_FILE in "${TEST_FILES[@]}"; do
 
             if [ -z "$PREDICTED" ] || [ "$PREDICTED" == "null" ]; then
                 echo -e "${RED}✗${NC} $TEST_ID - Invalid output format"
-                ((FAILED++))
+                FAILED=$((FAILED + 1))
             elif [ "$HAS_ANSWERS" = true ]; then
                 # Compare with expected output if we have answers
                 ANSWER_FILE="$EXPECTED_OUTPUTS_DIR/${TEST_NAME}.json"
@@ -95,24 +95,24 @@ for TEST_FILE in "${TEST_FILES[@]}"; do
 
                     if [ "$PREDICTED" == "$EXPECTED" ]; then
                         echo -e "${GREEN}✓${NC} $TEST_ID"
-                        ((PASSED++))
+                        PASSED=$((PASSED + 1))
                     else
                         echo -e "${RED}✗${NC} $TEST_ID - Incorrect prediction"
-                        ((FAILED++))
+                        FAILED=$((FAILED + 1))
                     fi
                 else
                     # No answer file for this test
                     echo -e "${YELLOW}?${NC} $TEST_ID - Output generated (no answer file found)"
-                    ((PASSED++))
+                    PASSED=$((PASSED + 1))
                 fi
             else
                 # No answer key, just check format
                 echo -e "${YELLOW}?${NC} $TEST_ID - Output generated (no answer key to verify)"
-                ((PASSED++))
+                PASSED=$((PASSED + 1))
             fi
         else
             echo -e "${RED}✗${NC} $TEST_ID - Invalid JSON output"
-            ((FAILED++))
+            FAILED=$((FAILED + 1))
         fi
     else
         # Execution error
@@ -120,7 +120,7 @@ for TEST_FILE in "${TEST_FILES[@]}"; do
         if [ -s "$ERROR_FILE" ]; then
             echo -e "  ${RED}Error:${NC} $(head -n 1 "$ERROR_FILE")"
         fi
-        ((ERRORS++))
+        ERRORS=$((ERRORS + 1))
     fi
 done
 
@@ -133,7 +133,7 @@ echo ""
 # Calculate stats
 PASS_RATE=0
 if [ $TOTAL_TESTS -gt 0 ]; then
-    PASS_RATE=$(echo "scale=1; $PASSED * 100 / $TOTAL_TESTS" | bc)
+    PASS_RATE=$(awk -v p="$PASSED" -v t="$TOTAL_TESTS" 'BEGIN { printf "%.1f", (p * 100.0) / t }')
 fi
 
 echo -e "Total Tests:    ${YELLOW}$TOTAL_TESTS${NC}"

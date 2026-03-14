@@ -1,0 +1,12 @@
+{
+  "tracks": [
+    "Bahrain",
+    "COTA",
+    "Monaco",
+    "Monza",
+    "Silverstone",
+    "Spa",
+    "Suzuka"
+  ],
+  "feature_dim": 39
+}
